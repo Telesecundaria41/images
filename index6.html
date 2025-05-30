@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rúbrica de Evaluación Docente</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Fondo gris claro */
+        }
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e0e0e0;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #a0a0a0;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #808080;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-6 lg:p-8">
+    <div class="max-w-4xl mx-auto bg-white p-6 sm:p-8 rounded-lg shadow-xl border border-gray-200">
+        <h1 class="text-3xl sm:text-4xl font-bold text-center text-gray-800 mb-6">Rúbrica de Evaluación para la Práctica Docente</h1>
+        <p class="text-gray-600 text-center mb-8">Marque el nivel de desempeño que mejor describa la actuación del estudiante durante su jornada de práctica.</p>
+
+        <form id="evaluationForm" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div>
+                    <label for="studentName" class="block text-sm font-medium text-gray-700 mb-1">Nombre del practicante:</label>
+                    <select id="studentName" name="studentName" required
+                            class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        <option value="">Seleccione un estudiante</option>
+                        <option value="Chaparro Hernández, Andrea">Chaparro Hernández, Andrea</option>
+                        <option value="Covarrubias Ruiz, Arely Azucena">Covarrubias Ruiz, Arely Azucena</option>
+                        <option value="Gómez Gámez, América Vianey">Gómez Gámez, América Vianey</option>
+                        <option value="López Aldama, Denisse">López Aldama, Denisse</option>
+                        <option value="López León, Martha Cecilia">López León, Martha Cecilia</option>
+                        <option value="Luna Pérez, Maritza Marlén">Luna Pérez, Maritza Marlén</option>
+                        <option value="Martínez Pérez, Mónica Patricia">Martínez Pérez, Mónica Patricia</option>
+                        <option value="Morales Ramírez, Miguel Ángel">Morales Ramírez, Miguel Ángel</option>
+                        <option value="Sánchez De la Rocha, Mireya Naiomy">Sánchez De la Rocha, Mireya Naiomy</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="gradeGroup" class="block text-sm font-medium text-gray-700 mb-1">Grado y grupo atendido:</label>
+                    <input type="text" id="gradeGroup" name="gradeGroup" required
+                           class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                </div>
+                <div>
+                    <label for="tutorName" class="block text-sm font-medium text-gray-700 mb-1">Nombre del docente tutor:</label>
+                    <input type="text" id="tutorName" name="tutorName" required
+                           class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                </div>
+                <div>
+                    <label for="primarySchool" class="block text-sm font-medium text-gray-700 mb-1">Escuela Primaria:</label>
+                    <input type="text" id="primarySchool" name="primarySchool" required
+                           class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                </div>
+                <div>
+                    <label for="tutorEmail" class="block text-sm font-medium text-gray-700 mb-1">Correo electrónico del docente tutor:</label>
+                    <input type="email" id="tutorEmail" name="tutorEmail" required
+                           class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                </div>
+                <div>
+                    <label for="tutorPhone" class="block text-sm font-medium text-gray-700 mb-1">Número de teléfono del docente tutor:</label>
+                    <input type="tel" id="tutorPhone" name="tutorPhone"
+                           class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                </div>
+            </div>
+
+            <div class="overflow-x-auto rounded-lg shadow-md border border-gray-200">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3">Rasgo</th>
+                            <th scope="col" class="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Excelente (4)</th>
+                            <th scope="col" class="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Satisfactorio (3)</th>
+                            <th scope="col" class="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Básico (2)</th>
+                            <th scope="col" class="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Necesita mejorar (1)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr>
+                            <td class="px-4 py-4 whitespace-normal text-sm font-medium text-gray-900">
+                                <p><strong>1. Presentación y puntualidad</strong></p>
+                                <p class="text-xs text-gray-500 mt-1">Siempre llega puntual, con presentación profesional impecable y materiales listos.</p>
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait1" value="4" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500" required>
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait1" value="3" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait1" value="2" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait1" value="1" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-4 py-4 whitespace-normal text-sm font-medium text-gray-900">
+                                <p><strong>2. Responsabilidad y organización</strong></p>
+                                <p class="text-xs text-gray-500 mt-1">Demuestra excelente organización en sus actividades y cumple todos sus compromisos.</p>
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait2" value="4" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500" required>
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait2" value="3" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait2" value="2" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait2" value="1" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-4 py-4 whitespace-normal text-sm font-medium text-gray-900">
+                                <p><strong>3. Planeación didáctica</strong></p>
+                                <p class="text-xs text-gray-500 mt-1">Presenta planeaciones completas, detalladas y con adaptaciones para la diversidad.</p>
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait3" value="4" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500" required>
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait3" value="3" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait3" value="2" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait3" value="1" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-4 py-4 whitespace-normal text-sm font-medium text-gray-900">
+                                <p><strong>4. Estrategias de mediación</strong></p>
+                                <p class="text-xs text-gray-500 mt-1">Implementa variedad de estrategias de mediación efectivas y diferenciadas.</p>
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait4" value="4" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500" required>
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait4" value="3" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait4" value="2" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait4" value="1" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-4 py-4 whitespace-normal text-sm font-medium text-gray-900">
+                                <p><strong>5. Control grupal</strong></p>
+                                <p class="text-xs text-gray-500 mt-1">Mantiene excelente control del grupo con estrategias positivas.</p>
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait5" value="4" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500" required>
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait5" value="3" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait5" value="2" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait5" value="1" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-4 py-4 whitespace-normal text-sm font-medium text-gray-900">
+                                <p><strong>6. Ambiente inclusivo</strong></p>
+                                <p class="text-xs text-gray-500 mt-1">Promueve constantemente un ambiente inclusivo y participativo.</p>
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait6" value="4" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500" required>
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait6" value="3" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait6" value="2" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait6" value="1" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-4 py-4 whitespace-normal text-sm font-medium text-gray-900">
+                                <p><strong>7. Ajustes razonables</strong></p>
+                                <p class="text-xs text-gray-500 mt-1">Implementa ajustes pertinentes y creativos según necesidades.</p>
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait7" value="4" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500" required>
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait7" value="3" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait7" value="2" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait7" value="1" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-4 py-4 whitespace-normal text-sm font-medium text-gray-900">
+                                <p><strong>8. Participación equitativa</strong></p>
+                                <p class="text-xs text-gray-500 mt-1">Promueve la participación activa de todo el alumnado.</p>
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait8" value="4" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500" required>
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait8" value="3" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait8" value="2" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait8" value="1" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-4 py-4 whitespace-normal text-sm font-medium text-gray-900">
+                                <p><strong>9. Comunicación con alumnos</strong></p>
+                                <p class="text-xs text-gray-500 mt-1">Comunicación clara, efectiva y adaptada a necesidades.</p>
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait9" value="4" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500" required>
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait9" value="3" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait9" value="2" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait9" value="1" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-4 py-4 whitespace-normal text-sm font-medium text-gray-900">
+                                <p><strong>10. Vinculación docente-tutor</strong></p>
+                                <p class="text-xs text-gray-500 mt-1">Mantiene comunicación constante y colaboración efectiva.</p>
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait10" value="4" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500" required>
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait10" value="3" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait10" value="2" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                            </td>
+                            <td class="px-2 py-4 text-center">
+                                <input type="radio" name="trait10" value="1" class="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <div class="flex flex-col sm:flex-row justify-between items-center mb-4">
+                    <p class="text-lg font-semibold text-gray-800 mb-2 sm:mb-0">Puntaje Total: <span id="totalScore" class="text-blue-600 text-2xl">0</span> / 40</p>
+                    <p class="text-lg font-semibold text-gray-800">Escala de Evaluación: <span id="evaluationScale" class="text-blue-600 text-2xl">N/A</span></p>
+                </div>
+                <div class="text-sm text-gray-700">
+                    <p><strong>Escala:</strong></p>
+                    <ul class="list-disc list-inside ml-4">
+                        <li>Excelente: 36-40 puntos</li>
+                        <li>Satisfactorio: 30-35 puntos</li>
+                        <li>Básico: 20-29 puntos</li>
+                        <li>Necesita mejorar: &lt; 20 puntos</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="mt-8 space-y-6">
+                <div>
+                    <label for="observations" class="block text-sm font-medium text-gray-700 mb-1">Observaciones y recomendaciones:</label>
+                    <textarea id="observations" name="observations" rows="4"
+                              class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"></textarea>
+                </div>
+                <div>
+                    <label for="opportunities" class="block text-sm font-medium text-gray-700 mb-1">Áreas de oportunidad:</label>
+                    <textarea id="opportunities" name="opportunities" rows="4"
+                              class="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"></textarea>
+                </div>
+            </div>
+
+            <div class="mt-8 text-center">
+                <button type="submit" id="submitButton"
+                        class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition ease-in-out duration-150 transform hover:scale-105">
+                    <svg class="-ml-1 mr-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                    </svg>
+                    Enviar Rúbrica
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div id="messageModal" class="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center hidden">
+        <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
+            <h3 id="modalTitle" class="text-xl font-semibold text-gray-900 mb-4"></h3>
+            <p id="modalMessage" class="text-gray-700 mb-6"></p>
+            <button id="closeModalButton" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">Cerrar</button>
+        </div>
+    </div>
+
+    <div id="loadingOverlay" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
+        <div class="flex flex-col items-center">
+            <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
+            <p class="text-white text-lg mt-4">Enviando...</p>
+        </div>
+    </div>
+
+    <script>
+        // Initialize EmailJS with your Public Key
+        // IMPORTANT: Replace 'YOUR_EMAILJS_PUBLIC_KEY' with your actual EmailJS Public Key
+        emailjs.init('bwrrgx6h0RfA1V3hS'); 
+
+        const form = document.getElementById('evaluationForm');
+        const totalScoreSpan = document.getElementById('totalScore');
+        const evaluationScaleSpan = document.getElementById('evaluationScale');
+        const submitButton = document.getElementById('submitButton');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const messageModal = document.getElementById('messageModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalMessage = document.getElementById('modalMessage');
+        const closeModalButton = document.getElementById('closeModalButton');
+
+        // Function to calculate total score and update scale
+        function calculateScore() {
+            let totalScore = 0;
+            for (let i = 1; i <= 10; i++) {
+                const selectedOption = document.querySelector(`input[name="trait${i}"]:checked`);
+                if (selectedOption) {
+                    totalScore += parseInt(selectedOption.value);
+                }
+            }
+            totalScoreSpan.textContent = totalScore;
+            updateEvaluationScale(totalScore);
+        }
+
+        // Function to update evaluation scale based on total score
+        function updateEvaluationScale(score) {
+            let scale = 'N/A';
+            if (score >= 36) {
+                scale = 'Excelente';
+            } else if (score >= 30) {
+                scale = 'Satisfactorio';
+            } else if (score >= 20) {
+                scale = 'Básico';
+            } else {
+                scale = 'Necesita mejorar';
+            }
+            evaluationScaleSpan.textContent = scale;
+        }
+
+        // Add event listeners to all radio buttons to recalculate score on change
+        document.querySelectorAll('input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', calculateScore);
+        });
+
+        // Initial calculation when the page loads
+        calculateScore();
+
+        // Function to show the modal
+        function showModal(title, message) {
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+            messageModal.classList.remove('hidden');
+        }
+
+        // Function to hide the modal
+        function hideModal() {
+            messageModal.classList.add('hidden');
+        }
+
+        // Close modal button event listener
+        closeModalButton.addEventListener('click', hideModal);
+
+        // Handle form submission
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            // Show loading overlay
+            loadingOverlay.classList.remove('hidden');
+            submitButton.disabled = true; // Disable button to prevent multiple submissions
+
+            // Collect form data
+            const formData = new FormData(form);
+            const data = {};
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+
+            // Get selected rubric scores
+            const rubricScores = {};
+            for (let i = 1; i <= 10; i++) {
+                const selectedOption = document.querySelector(`input[name="trait${i}"]:checked`);
+                if (selectedOption) {
+                    rubricScores[`trait${i}`] = selectedOption.value;
+                } else {
+                    // If a trait is not selected, set it to 0 or handle as an error
+                    rubricScores[`trait${i}`] = '0';
+                }
+            }
+
+            // Prepare template parameters for EmailJS
+            const templateParams = {
+                student_name: data.studentName,
+                grade_group: data.gradeGroup,
+                tutor_name: data.tutorName,
+                primary_school: data.primarySchool,
+                tutor_email: data.tutorEmail,
+                tutor_phone: data.tutorPhone || 'No proporcionado', // Optional field
+                total_score: totalScoreSpan.textContent,
+                evaluation_scale: evaluationScaleSpan.textContent,
+                observations: data.observations || 'No hay observaciones.',
+                opportunities: data.opportunities || 'No hay áreas de oportunidad.',
+                // Individual trait scores
+                trait1_score: rubricScores.trait1,
+                trait2_score: rubricScores.trait2,
+                trait3_score: rubricScores.trait3,
+                trait4_score: rubricScores.trait4,
+                trait5_score: rubricScores.trait5,
+                trait6_score: rubricScores.trait6,
+                trait7_score: rubricScores.trait7,
+                trait8_score: rubricScores.trait8,
+                trait9_score: rubricScores.trait9,
+                trait10_score: rubricScores.trait10,
+                // Recipient email for EmailJS template
+                to_email: 'profrjesusvasquez@gmail.com'
+            };
+
+            // Send email using EmailJS
+            try {
+                // IMPORTANT: Replace 'YOUR_EMAILJS_SERVICE_ID' and 'YOUR_EMAILJS_TEMPLATE_ID' with your actual EmailJS IDs
+                await emailjs.send('service_44s0hzy', 'template_68q3qa4', templateParams);
+                showModal('Éxito', 'La rúbrica ha sido enviada correctamente.');
+                form.reset(); // Clear the form after successful submission
+                calculateScore(); // Reset score display
+            } catch (error) {
+                console.error('Error al enviar la rúbrica:', error);
+                showModal('Error', 'Hubo un problema al enviar la rúbrica. Por favor, inténtelo de nuevo.');
+            } finally {
+                // Hide loading overlay
+                loadingOverlay.classList.add('hidden');
+                submitButton.disabled = false; // Re-enable button
+            }
+        });
+    </script>
+</body>
+</html>
