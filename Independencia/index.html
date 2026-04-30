@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa de Independencias en América Latina</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Leaflet CSS y JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+
+    <style>
+        body { margin: 0; padding: 0; font-family: 'Nunito', sans-serif; overflow: hidden; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; z-index: 10; }
+        #info-modal { z-index: 9999; }
+        .font-serif { font-family: 'Lora', serif; }
+        
+        /* Animación suave para el modal */
+        .modal-enter { opacity: 0; transform: scale(0.95) translateY(10px); }
+        .modal-enter-active { opacity: 1; transform: scale(1) translateY(0); transition: all 0.3s ease-out; }
+        .modal-exit { opacity: 1; transform: scale(1) translateY(0); }
+        .modal-exit-active { opacity: 0; transform: scale(0.95) translateY(10px); transition: all 0.2s ease-in; }
+        
+        /* Tooltip de Leaflet personalizado */
+        .leaflet-tooltip { font-family: 'Nunito', sans-serif; font-weight: 600; padding: 4px 8px; border-radius: 6px; }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <!-- Contenedor del Mapa -->
+    <div id="map"></div>
+    
+    <!-- Banner Superior -->
+    <div class="absolute top-0 left-0 w-full z-20 pointer-events-none p-4 flex justify-center">
+        <div class="bg-white/90 backdrop-blur-md shadow-lg rounded-full px-6 py-3 border border-gray-200 pointer-events-auto">
+            <h1 class="text-lg md:text-xl font-bold text-gray-800 text-center">
+                <span class="text-red-600">📍</span> Independencias de América Latina (Siglo XIX)
+            </h1>
+            <p class="text-xs md:text-sm text-gray-500 text-center font-medium mt-1">Haz clic en los marcadores para conocer la historia</p>
+        </div>
+    </div>
+
+    <!-- Modal / Tarjeta de Información -->
+    <div id="info-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+        <div id="modal-content" class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden flex flex-col max-h-[90vh] transition-transform duration-300 scale-95">
+            
+            <!-- Imagen del Personaje -->
+            <div class="relative h-56 w-full bg-gray-200 shrink-0">
+                <img id="modal-image" src="" alt="Personaje Histórico" class="w-full h-full object-cover object-top" onerror="this.onerror=null; this.src='https://placehold.co/600x400/e2e8f0/475569?text=Sin+Imagen'">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                <div class="absolute bottom-0 left-0 p-5 w-full">
+                    <span id="modal-date" class="inline-block px-2 py-1 bg-red-600 text-white text-xs font-bold rounded mb-2 shadow-sm"></span>
+                    <h2 id="modal-country" class="text-3xl font-bold text-white mb-1 shadow-sm"></h2>
+                </div>
+            </div>
+
+            <!-- Cuerpo de la Tarjeta -->
+            <div class="p-6 overflow-y-auto">
+                <h3 class="text-sm uppercase tracking-wider text-gray-500 font-bold mb-1">Personaje Principal</h3>
+                <p id="modal-figure" class="text-xl font-bold text-gray-800 mb-4 pb-2 border-b border-gray-100"></p>
+                
+                <h3 class="text-sm uppercase tracking-wider text-gray-500 font-bold mb-2">Contexto Histórico</h3>
+                <p id="modal-details" class="text-gray-700 leading-relaxed mb-6 text-sm"></p>
+                
+                <div class="bg-amber-50 rounded-xl p-4 border border-amber-100 relative">
+                    <div class="absolute -top-3 -left-2 text-4xl text-amber-300 font-serif">"</div>
+                    <h3 class="text-xs uppercase tracking-wider text-amber-800 font-bold mb-1 ml-4">Frase Célere o Dato Curioso</h3>
+                    <p id="modal-quote" class="font-serif italic text-amber-900 text-sm ml-4 leading-relaxed relative z-10"></p>
+                </div>
+            </div>
+
+            <!-- Botón de Cierre -->
+            <div class="p-4 bg-gray-50 border-t border-gray-100 shrink-0">
+                <button onclick="closeModal()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-xl transition duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                    </svg>
+                    Regresar al mapa
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- BASE DE DATOS HISTÓRICA ---
+        const countriesData = [
+            {
+                country: "México",
+                lat: 22.5,
+                lng: -100.0,
+                date: "16 de septiembre de 1810",
+                figure: "Miguel Hidalgo y Costilla",
+                image: "https://telesecundaria41.github.io/images/MiguelHidalgo.png",
+                details: "El proceso inició de madrugada con el emblemático 'Grito de Dolores' liderado por el cura Miguel Hidalgo. Aunque él no vivió para verla consumada, este acto desató una guerra de 11 años que culminó en 1821 con la entrada triunfal del Ejército Trigarante a la Ciudad de México.",
+                quote: "¡Viva la Independencia! ¡Viva la América! ¡Muera el mal gobierno!"
+            },
+            {
+                country: "Colombia",
+                lat: 4.5709,
+                lng: -74.2973,
+                date: "20 de julio de 1810",
+                figure: "Simón Bolívar",
+                image: "https://telesecundaria41.github.io/images/SimonBolivar.png",
+                details: "Todo comenzó por un altercado planeado conocido como 'El Florero de Llorente'. La victoria definitiva, sin embargo, se logró años después, en la decisiva Batalla de Boyacá en 1819 bajo la genialidad militar de Simón Bolívar.",
+                quote: "Dato curioso: Tras liberar la región, Bolívar fundó la 'Gran Colombia', una inmensa nación que unía a las actuales Colombia, Venezuela, Ecuador y Panamá."
+            },
+            {
+                country: "Argentina",
+                lat: -34.6037,
+                lng: -58.3816,
+                date: "9 de julio de 1816",
+                figure: "José de San Martín",
+                image: "https://telesecundaria41.github.io/images/JoseDeSanMartin.png",
+                details: "Declaró formalmente su independencia en el Congreso de Tucumán de las Provincias Unidas del Río de la Plata. San Martín, un estratega brillante, posteriormente realizaría la hazaña épica de cruzar la cordillera de los Andes para liberar también a Chile y Perú.",
+                quote: "Serás lo que debas ser, o no serás nada."
+            },
+            {
+                country: "Perú",
+                lat: -12.0464,
+                lng: -77.0428,
+                date: "28 de julio de 1821",
+                figure: "José de San Martín / Simón Bolívar",
+                image: "https://telesecundaria41.github.io/images/SanMartinBolivar.png",
+                details: "San Martín proclamó la independencia en la Plaza Mayor de Lima. Sin embargo, el centro del poder español era tan fuerte que la guerra continuó hasta 1824, cuando las fuerzas combinadas de Simón Bolívar y Antonio José de Sucre sellaron la victoria en la Batalla de Ayacucho.",
+                quote: "El Perú es desde este momento libre e independiente por la voluntad general de los pueblos."
+            },
+            {
+                country: "Chile",
+                lat: -33.4489,
+                lng: -70.6693,
+                date: "12 de febrero de 1818",
+                figure: "Bernardo O'Higgins",
+                image: "https://telesecundaria41.github.io/images/BernardoOHiggins.png",
+                details: "Tras la dolorosa derrota en Rancagua, los patriotas chilenos se reorganizaron en Argentina. Junto a San Martín, el Ejército Libertador de los Andes retornó y consolidó la independencia tras las épicas batallas de Chacabuco y Maipú.",
+                quote: "¡O vivir con honor o morir con gloria! ¡El que sea valiente que me siga!"
+            },
+            {
+                country: "Venezuela",
+                lat: 10.4806,
+                lng: -66.9036,
+                date: "5 de julio de 1811",
+                figure: "Francisco de Miranda",
+                image: "https://telesecundaria41.github.io/images/FranciscoDeMiranda.png",
+                details: "Fue la primera colonia en Hispanoamérica en declarar formalmente su absoluta independencia. La guerra fue brutal y sangrienta, sufriendo varias caídas de la república antes de ser finalmente liberada por Bolívar en la Batalla de Carabobo en 1821.",
+                quote: "Dato curioso: Francisco de Miranda, precursor de la independencia, es el único americano que tiene su nombre grabado en el Arco del Triunfo en París."
+            },
+            {
+                country: "Ecuador",
+                lat: -0.1807,
+                lng: -78.4678,
+                date: "24 de mayo de 1822",
+                figure: "Antonio José de Sucre",
+                image: "https://telesecundaria41.github.io/images/AntonioJoseDeSucre.png",
+                details: "Aunque el primer grito de independencia fue en Quito en 1809, la liberación definitiva llegó en las faldas del volcán Pichincha. El joven general Sucre, lugarteniente de Bolívar, logró una victoria táctica magistral a más de 3000 metros de altura.",
+                quote: "La justicia es la reina de las virtudes republicanas y con ella se sostiene la igualdad y la libertad."
+            },
+            {
+                country: "Brasil",
+                lat: -22.9068,
+                lng: -43.1729,
+                date: "7 de septiembre de 1822",
+                figure: "Pedro I de Brasil",
+                image: "https://telesecundaria41.github.io/images/PedroBrasil.png",
+                details: "A diferencia del resto de Latinoamérica, su independencia fue relativamente pacífica y peculiar: fue proclamada por el propio príncipe heredero de Portugal, Dom Pedro, a orillas del río Ipiranga, estableciendo un Imperio en lugar de una República.",
+                quote: "¡Independencia o Muerte! (El famoso 'Grito de Ipiranga')"
+            },
+            {
+                country: "Haití",
+                lat: 18.9712,
+                lng: -72.2852,
+                date: "1 de enero de 1804",
+                figure: "Jean-Jacques Dessalines",
+                image: "https://telesecundaria41.github.io/images/Jean-JacquesDessalines.png",
+                details: "Haití hizo historia mundial al ser la primera nación de América Latina y el Caribe en independizarse, y la única nación en el mundo nacida de una exitosa rebelión de personas esclavizadas, derrotando al poderoso ejército de Napoleón Bonaparte.",
+                quote: "Dato curioso: Dessalines arrancó la franja blanca de la bandera tricolor francesa para crear la primera bandera haitiana (azul y roja), simbolizando la expulsión de los colonos blancos."
+            }
+        ];
+
+        // --- CONFIGURACIÓN DEL MAPA LEAFLET ---
+        
+        // 1. Inicializar el mapa centrado en Sudamérica
+        const map = L.map('map', {
+            zoomControl: false // Quitamos el control por defecto para ponerlo abajo
+        }).setView([-10, -70], 3);
+
+        // Reposicionar el control de zoom
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+        // 2. Capa base tipo "Google Maps" (Estilo Voyager de CartoDB, claro y moderno)
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 20
+        }).addTo(map);
+
+        // 3. Crear el Icono Rojo personalizado (estilo Pin)
+        const redIcon = new L.Icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
+
+        // 4. Elementos del DOM del Modal
+        const modal = document.getElementById('info-modal');
+        const modalContent = document.getElementById('modal-content');
+        
+        // --- FUNCIÓN PARA ABRIR MODAL ---
+        function openModal(data) {
+            // Llenar datos
+            document.getElementById('modal-country').innerText = data.country;
+            document.getElementById('modal-date').innerText = data.date;
+            document.getElementById('modal-figure').innerText = data.figure;
+            document.getElementById('modal-details').innerText = data.details;
+            document.getElementById('modal-quote').innerText = data.quote;
+            document.getElementById('modal-image').src = data.image;
+
+            // Mostrar y animar
+            modal.classList.remove('hidden');
+            // Forzar reflow para que funcione la transición de opacidad
+            void modal.offsetWidth; 
+            modal.classList.remove('opacity-0');
+            modal.classList.add('opacity-100');
+            
+            modalContent.classList.remove('scale-95');
+            modalContent.classList.add('scale-100');
+        }
+
+        // --- FUNCIÓN PARA CERRAR MODAL ---
+        function closeModal() {
+            modal.classList.remove('opacity-100');
+            modal.classList.add('opacity-0');
+            modalContent.classList.remove('scale-100');
+            modalContent.classList.add('scale-95');
+            
+            // Esperar a que termine la animación antes de ocultar
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        // Cerrar al hacer clic fuera del contenido de la tarjeta
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // 5. Generar marcadores en el mapa
+        countriesData.forEach(data => {
+            const marker = L.marker([data.lat, data.lng], { icon: redIcon })
+                .addTo(map);
+
+            // Añadir tooltip que aparece al pasar el ratón (Hover)
+            marker.bindTooltip(data.country, {
+                direction: 'top',
+                offset: [0, -40],
+                opacity: 0.9,
+                className: 'shadow-lg border-0'
+            });
+
+            // Añadir evento Click al marcador
+            marker.on('click', () => {
+                // Centrar el mapa en el marcador con un leve desplazamiento para acomodar el modal
+                map.flyTo([data.lat, data.lng], 5, { duration: 1.5 });
+                openModal(data);
+            });
+        });
+
+        // Ajuste inicial para que todos los marcadores sean visibles en móviles
+        const group = new L.featureGroup(countriesData.map(d => L.marker([d.lat, d.lng])));
+        map.fitBounds(group.getBounds(), { padding: [50, 50] });
+
+    </script>
+</body>
+</html>
